@@ -6,4 +6,5 @@ Project Title (C144): Development of Dynamic Balancing Safety Program Package fo
 This project was carried out in collaboration with A*STAR Singapore (Robotics and Autonomous Systems Department)
 
 Supervisor: Professor Yeo Song Huat
+
 Co-Supervisor: Dr Yuan Qilong
