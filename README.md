@@ -17,17 +17,21 @@ To run the program package:
 3) To run the following nodes in order
   
   a) rosrun dynamic_balancing_v2 find_CG_with_marker
+  
      -For the input "Please input the model name that is to be calculated: ", please enter 'robot'.
      -For the input "Please input the reference frame where you would like the marker to be displayed in: ", please enter 'base_link'.
      
   b) rosrun dynamic_balancing_v2 imu_filter
+  
      -For the input "Please input the ROS topic to extract IMU data from: ", please enter '/MobileManipulator/imu_topic'.
      
   c) rosrun dynamic_balancing_v2 get_ZMP
+  
      -For the input "Please input the ROS topic to extract IMU data from: ", please enter '/filtered_imu'.
      -For the input "Please input the reference frame where you would like the marker to be displayed in: ", please enter 'base_link'.
      
   d) rosrun dynamic_balancing_v2 wheel_position
+  
      -For the input "Please input the reference frame with respect to the wheels: ", please enter 'base_link'.
    
   e) rosrun dynamic_balancing_v2 support_polygon
