@@ -15,6 +15,7 @@ To run the program package:
 1) Pull "dynamic_balancing_v2" program package into a catkin workspace and build via 'catkin build'.
 2) Run launch file with command 'roslaunch dynamic_balancing_v2 dynamic_balancing_husky.launch
 3) To run the following nodes in order
+  
   a) rosrun dynamic_balancing_v2 find_CG_with_marker
      -For the input "Please input the model name that is to be calculated: ", please enter 'robot'.
      -For the input "Please input the reference frame where you would like the marker to be displayed in: ", please enter 'base_link'.
