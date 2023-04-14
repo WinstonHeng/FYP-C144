@@ -1,0 +1,300 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://wiki.ros.org/xacro"
+
+       name="husky_ur5e" >
+       <xacro:property name="enable_localization" value="true"/>
+
+  <xacro:arg name="transmission_hw_interface" default="hardware_interface/PositionJointInterface"/>
+
+  <!-- common stuff -->
+  <xacro:include filename="$(find dynamic_balancing_v2)/urdf/common.gazebo.xacro" />
+
+  <!-- ur5 -->
+  <xacro:include filename="$(find dynamic_balancing_v2)/urdf/HWC_ur5e.urdf.xacro" />
+
+  <!-- Included URDF/XACRO Sensor Files -->
+  <xacro:include filename="$(find dynamic_balancing_v2)/urdf/decorations4UR5.urdf.xacro" />
+  <xacro:include filename="$(find dynamic_balancing_v2)/urdf/wheel4UR5.urdf.xacro" />
+  <xacro:include filename="$(find dynamic_balancing_v2)/urdf/wheel.urdf.xacro" />
+  <xacro:include filename="$(find dynamic_balancing_v2)/urdf/IMU.gazebo.xacro" />
+
+
+
+  <!-- Sensor Config Selection -->
+  <xacro:property name="sensor_config" default="$(optenv SENSOR_CONFIG 1)" />
+
+  <!-- Enable Localization -->
+  <xacro:property name="enable_localization" default="$(optenv ENABLE_LOC false" />
+
+  <xacro:property name="M_PI" value="3.14159"/>
+
+  <!--Husky Base Size -->
+  <xacro:property name="base_x_size" value="0.98740000" />
+  <xacro:property name="base_y_size" value="0.57090000" />
+  <xacro:property name="base_z_size" value="0.24750000" />
+
+  <!-- Wheel Mounting Positions -->
+  <xacro:property name="wheelbase" value="0.5120" />
+  <xacro:property name="track" value="0.5708" />
+  <xacro:property name="wheel_vertical_offset" value="0.03282" />
+
+  <!-- Wheel Properties -->
+  <xacro:property name="wheel_length" value="0.1143" />
+  <xacro:property name="wheel_radius" value="0.1651" />
+
+  <!-- Base Link UR from Base Link Husky Properties -->
+  <xacro:property name="base_link_height" value="1.15" />  
+  <xacro:property name="base_link_offset_UR2Husky" value="0.03282" /> 
+
+  <!-- Control Box Properties -->
+  <xacro:property name="control_box_width" value="0.52" />  
+  <xacro:property name="control_box_length" value="0.59" /> 
+  <xacro:property name="control_box_height" value="0.68" /> 
+
+  <!-- arm -->
+  <xacro:ur5e_robot prefix="" joint_limited="true"
+    shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi/12}"
+    shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
+    elbow_joint_lower_limit="${-pi}" elbow_joint_upper_limit="${pi}"
+    wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
+    wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
+    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"
+    transmission_hw_interface="$(arg transmission_hw_interface)"
+    safety_limits="false" safety_pos_margin="0.15"
+    safety_k_position="20"
+  />
+
+		<xacro:macro name="default_inertial" params="mass">
+			<inertial>
+				<mass value="${mass}" />
+				<origin xyz="0 0 0" rpy="0 0 0" />
+				<!-- <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" /> -->
+				<inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1" />
+			</inertial>
+		</xacro:macro>
+
+
+		<xacro:macro name="connection_link" params="name">
+			 	<link name="${name}">
+			 		<visual>
+				 			<geometry>
+					 			<cylinder length="0.005" radius="0.005"/>
+				 			</geometry>
+						<origin rpy="0 0 0" xyz="0 0 0"/>
+			 		</visual>
+					<collision>
+				 			<geometry>
+					 			<cylinder length="0.00" radius="0.00"/>
+				 			</geometry>
+						<origin rpy="0 0 0" xyz="0 0 0"/>
+			 		</collision>
+				<xacro:default_inertial mass="1"/>
+		 	</link>
+		</xacro:macro>
+
+   <xacro:unless value="${enable_localization}">
+		<link name="world" />
+		<xacro:connection_link name="clink_x"/>
+
+		<joint name="robot_tx" type="prismatic">
+			<parent link="world"/>
+			<child link="clink_x"/>
+					<limit effort="1000.0" lower="-5" upper="5" velocity="0.5"/>
+			<axis xyz="1 0 0"/>
+			<origin xyz="0 0 ${base_link_height}"/>
+		</joint>
+
+		<transmission name="j1">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="robot_tx">
+				<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="motor1">
+				<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>  
+		
+		<xacro:connection_link name="clink_y"/>
+		<joint name="robot_ty" type="prismatic">
+		<parent link="clink_x"/>
+			<child link="clink_y"/>
+			<limit effort="5000.0" lower="-5" upper="5" velocity="0.5"/>
+			<axis xyz="0 1 0"/>
+			<origin xyz="0 0 0"/>
+		</joint>
+		<transmission name="j2">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="robot_ty">
+				<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="motor2">
+				<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>  
+
+		<joint name="robot_rz" type="continuous"> <!-- Shouldnt this be rotational?-->>
+			<parent link="clink_y"/>
+			<child link="base_link"/>
+				<limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.2"/>
+			<axis xyz="0 0 1"/>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+		</joint>
+		<transmission name="j3">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="robot_rz">
+				<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="motor3">
+				<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+	</xacro:unless>
+
+	  <!-- Base link is the center of the robot's bottom plate -->
+	  <link name="base_link_husky">
+	    <visual>
+	      <origin xyz="0 0 0" rpy="0 0 0" />
+	      <geometry>
+		<mesh filename="package://dynamic_balancing_v2/meshes/base_link.dae" />
+	      </geometry>
+	    </visual>
+	    <collision>
+	      <origin xyz="0 0 ${base_z_size/4}" rpy="0 0 0" />
+	      <geometry>
+			<box size="${ base_x_size } ${base_y_size} ${base_z_size/2}"/>
+	      </geometry>
+	    </collision>
+	    <collision>
+	      <origin xyz="0 0 ${base_z_size*3/4-0.01}" rpy="0 0 0" />
+	      <geometry>
+			<box size="${base_x_size*4/5} ${base_y_size} ${base_z_size/2-0.02}"/>
+	      </geometry>
+	    </collision>
+		<inertial>
+          <mass value="50" />
+          <origin xyz="0.0 0.0 0.0" />
+          <!-- <inertia ixx="50" ixy="0" ixz="0" iyy="50" iyz="0" izz="50" /> -->
+	      <inertia ixx="0.6022" ixy="0.0" ixz="0.0" iyy="1.7386" iyz="0.0" izz="2.0296" />
+		</inertial>
+	  </link>
+	  <!-- Inertial link stores the robot's inertial information -->
+	  <!-- <link name="inertial_link">
+	    <inertial>
+	      <mass value="46.034" />
+	      <origin xyz="-0.00065 -0.085 0.062" />
+	      <inertia ixx="0.6022" ixy="-0.02364" ixz="-0.1197" iyy="1.7386" iyz="-0.001544" izz="2.0296" />
+	    </inertial>
+	  </link>
+
+	  <joint name="inertial_joint" type="fixed">
+	    <origin xyz="0 0 0" rpy="0 0 0" />
+	    <parent link="base_link_husky" />
+	    <child link="inertial_link" />
+	  </joint> -->
+
+	 <joint name="jbox" type="fixed">
+		 <parent link="base_link"/>
+		 <child link="base_link_husky"/>
+		 <axis xyz="0 0 1"/>
+		 <origin rpy="0 0 0" xyz="0 0 ${-base_link_height+wheel_radius+wheel_vertical_offset}"/>
+	 </joint>
+	 
+	  <!-- Base footprint is on the ground under the robot -->
+	  <link name="base_footprint"/>
+
+	  <joint name="base_footprint_joint" type="fixed">
+	    <origin xyz="0 0 ${wheel_vertical_offset - wheel_radius}" rpy="0 0 0" />
+	    <parent link="base_link_husky" />
+	    <child link="base_footprint" />
+	  </joint>
+
+	  <!-- Husky wheel macros -->
+	  <xacro:unless value="${enable_localization}">
+		<xacro:husky_wheel wheel_prefix="front_left">
+			<origin xyz="${wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+		</xacro:husky_wheel>
+		
+		<xacro:husky_wheel wheel_prefix="front_right">
+			<origin xyz="${wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+		</xacro:husky_wheel>
+		<xacro:husky_wheel wheel_prefix="rear_right">
+			<origin xyz="${-wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+		</xacro:husky_wheel>
+		<xacro:husky_wheel wheel_prefix="rear_left">
+			<origin xyz="${-wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+		</xacro:husky_wheel>
+	  </xacro:unless>
+
+	  <xacro:if value="${enable_localization}">
+		<xacro:husky_wheel_move wheel_prefix="front_left">
+			<origin xyz="${wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+		</xacro:husky_wheel_move>
+		<xacro:husky_wheel_move wheel_prefix="front_right">
+			<origin xyz="${wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+		</xacro:husky_wheel_move>
+		<xacro:husky_wheel_move wheel_prefix="rear_right">
+			<origin xyz="${-wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+		</xacro:husky_wheel_move>
+		<xacro:husky_wheel_move wheel_prefix="rear_left">
+			<origin xyz="${-wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+		</xacro:husky_wheel_move>
+	  </xacro:if>
+
+	  <xacro:husky_decorate />
+
+	<link name="EEF" >
+		<visual>
+			<geometry>
+				<box size="0.05 0.05 0.05" />
+			</geometry>
+			<origin rpy="0 0 0" xyz="0.05 0.0 0.0"/>
+			<material name="white"/>
+		</visual>
+		<collision>
+			<geometry>
+				<box size="0.05 0.05 0.05" />
+			</geometry>
+			<origin rpy="0 0 0" xyz="0.05 0.0 0.0"/>
+		</collision>
+	</link>
+
+	 <joint name="jeef" type="fixed">
+		 <parent link="ee_link"/>
+		 <child link="EEF"/>
+		 <axis xyz="0 0 1"/>
+		 <origin rpy="0 0 0" xyz="0 0 0"/>
+	 </joint>
+	 
+	  
+	 
+
+	<link name="control_box" >
+		<visual>
+			<geometry>
+				<box size="${control_box_width} ${control_box_length} ${control_box_height}" />
+			</geometry>
+			<material name="white"/>
+		</visual>
+		<collision>
+			<geometry>
+				<box size="${control_box_width} ${control_box_length} ${control_box_height}" />
+			</geometry>
+		</collision>
+	</link>
+
+	 <joint name="jcb" type="fixed">
+		 <parent link="base_link"/>
+		 <child link="control_box"/>
+		 <axis xyz="0 0 1"/>
+		 <origin rpy="0 0 0" xyz="0 0 -0.35"/>
+	 </joint>
+	 
+    <xacro:gIMU parent="base_link_husky" name="imu_link" topic="imu_topic" hz="200" robot_namespace="MobileManipulator">
+            <origin xyz="0.0 0.0 0.2" rpy="0.0 0.0 0.0" />
+    </xacro:gIMU>
+
+</robot>
