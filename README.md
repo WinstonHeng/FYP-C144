@@ -1,7 +1,7 @@
 # FYP-C144
 This repository contains the program package for Heng Wei Chong's Final Year Project for NTU Bachelor of Engineering, for the AY 22/23.
 
-Project Title (C144): Development of Dynamic Balancing Safety Program Package for Mobile Manipulators
+Project Title (C144): Development of Dynamic Balancing Safety Program Package for Mobile Manipulators in Gazebo
 
 This project was carried out in collaboration with A*STAR Singapore (Robotics and Autonomous Systems Department)
 
@@ -13,6 +13,7 @@ Co-Supervisor: Dr Yuan Qilong
 To run the program package:
 
 Operating system: Ubuntu 20.04
+
 ROS distro: ROS Noetic
 
 Ensure that you have the following dependencies installed:
