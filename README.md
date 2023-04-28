@@ -12,9 +12,24 @@ Co-Supervisor: Dr Yuan Qilong
 
 To run the program package:
 
-1) Pull "dynamic_balancing_v2" program package into a catkin workspace and build via 'catkin build'.
-2) Run launch file with command 'roslaunch dynamic_balancing_v2 dynamic_balancing_husky.launch
-3) To run the following nodes in order
+Operating system: Ubuntu 20.04
+ROS distro: ROS Noetic
+
+Ensure that you have the following dependencies installed:
+- message_generation (sudo apt-get install ros-noetic-message-generation)
+- roscpp (sudo apt-get install ros-noetic-roscpp)
+- rospy (sudo apt-get install ros-noetic-rospy)
+- std_msgs (sudo apt-get install ros-noetic-std-msgs)
+- tf2_geometry_msgs (sudo apt-get install ros-noetic-tf2-geometry-msgs)
+- tf2_ros (sudo apt-get install ros-noetic-tf2-ros)
+- urdf (sudo apt-get install ros-noetic-urdf)
+- visualization_msgs (sudo apt-get install ros-noetic-visualization-msgs)
+- tf (sudo apt-get install ros-noetic-tf)
+
+1) Create a workspace via the command "mkdir -p ~/($name_of_workspace)_ws/src", with your own selected name for workspace.
+2) Pull "dynamic_balancing_v2" folder program package into a source folder of the workspace and build via 'catkin build'.
+3) Run launch file with command 'roslaunch dynamic_balancing_v2 dynamic_balancing_husky.launch
+4) To run the following nodes in order
   
   a) rosrun dynamic_balancing_v2 find_CG_with_marker
   
