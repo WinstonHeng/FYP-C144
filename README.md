@@ -26,6 +26,8 @@ Ensure that you have the following dependencies installed:
 - urdf (sudo apt-get install ros-noetic-urdf)
 - visualization_msgs (sudo apt-get install ros-noetic-visualization-msgs)
 - tf (sudo apt-get install ros-noetic-tf)
+- gazebo_ros (sudo apt-get install ros-noetic-gazebo-ros-pkgs ros-noetic-gazebo-ros-control)
+- Husky packages (sudo apt-get install ros-noetic-husky-desktop)
 
 1) Create a workspace via the command "mkdir -p ~/($name_of_workspace)_ws/src", with your own selected name for workspace.
 2) Pull "dynamic_balancing_v2" folder program package into a source folder of the workspace and build via 'catkin build'.
